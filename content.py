@@ -167,7 +167,10 @@ def p_y_x_nb(p_y, p_x_1_y, X):
         for m in range(0, M):
             B = 1
             for d in range(0, D):
-                B = B * ((p_x_1_y[m, d] ** X[n, d]) * ((1 - p_x_1_y[m, d]) ** (1 - X[n, d])))
+                if X[n, d] == 1:
+                    B *= p_x_1_y[m, d]
+                else:
+                    B *= (1 - p_x_1_y[m, d])
             B_y_sum += (B * p_y[m])
             B_y[0, m] = B
         for m in range(0, M):
