@@ -185,7 +185,7 @@ def model_selection_nb(Xtrain, Xval, ytrain, yval, a_values, b_values):
     :return: funkcja wykonuje selekcje modelu Naive Bayes - wybiera najlepsze wartosci parametrow a i b. Funkcja zwraca
     krotke (error_best, best_a, best_b, errors) gdzie best_error to najnizszy
     osiagniety blad, best_a - a dla ktorego blad byl najnizszy, best_b - b dla ktorego blad byl najnizszy,
-    errors - macierz wartosci bledow dla wszystkich par (a,b)
+    errors - macierz wartosci bledow dla wszystkich par (a,b) ?
     """
     error_best = 10
     A = len(a_values)
