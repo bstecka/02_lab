@@ -113,19 +113,19 @@ def run_training():
     data = load_data()
 
     # KNN model selection
-    # k_values = range(1, 201, 2)
-    # print('\n------------- Selekcja liczby sasiadow dla modelu dla KNN -------------')
-    #  print('-------------------- Wartosci k: 1, 3, ..., 200 -----------------------')
-    #  print('--------------------- To moze potrwac ok. 1 min ------------------------')
+    k_values = range(1, 201, 2)
+    print('\n------------- Selekcja liczby sasiadow dla modelu dla KNN -------------')
+    print('-------------------- Wartosci k: 1, 3, ..., 200 -----------------------')
+    print('--------------------- To moze potrwac ok. 1 min ------------------------')
 
-    # error_best, best_k, errors = model_selection_knn(data['Xval'],
-    #                                                   data['Xtrain'],
-    #                                                   data['yval'],
-    #                                                   data['ytrain'],
-    #                                                   k_values)
-    #    print('Najlepsze k: {num1} i najlepszy blad: {num2:.4f}'.format(num1=best_k, num2=error_best))
-    #   print('\n--- Wcisnij klawisz, aby kontynuowac ---')
-    #   classification_KNN_vs_no_neighbours(k_values, errors)
+    error_best, best_k, errors = model_selection_knn(data['Xval'],
+                                                       data['Xtrain'],
+                                                       data['yval'],
+                                                       data['ytrain'],
+                                                       k_values)
+    print('Najlepsze k: {num1} i najlepszy blad: {num2:.4f}'.format(num1=best_k, num2=error_best))
+    print('\n--- Wcisnij klawisz, aby kontynuowac ---')
+    classification_KNN_vs_no_neighbours(k_values, errors)
     a_values = [1, 3, 10, 30, 100, 300, 1000]
     b_values = [1, 3, 10, 30, 100, 300, 1000]
 
@@ -138,7 +138,7 @@ def run_training():
                                                             data['yval'], a_values, b_values)
 
     print('Najlepsze a: {}, b: {} i najlepszy blad: {:.4f}'.format(best_a,best_b,error_best))
-    #print('\n--- Wcisnij klawisz, aby kontynuowac ---')
+    print('\n--- Wcisnij klawisz, aby kontynuowac ---')
     plot_a_b_errors(errors, a_values, b_values)
     p_x_y = estimate_p_x_y_nb(data['Xtrain'], data['ytrain'], best_a, best_b)
 
@@ -161,18 +161,17 @@ def run_training():
 
     print('\n----------------Porownanie bledow dla KNN i NB---------------------')
 
-    #   Dist = hamming_distance(data['Xtest'], data['Xtrain'])
-    #   y_sorted = sort_train_labels_knn(Dist, data['ytrain'])
-    #   p_y_x = p_y_x_knn(y_sorted, best_k)
-    #    error_KNN = classification_error(p_y_x, data['ytest'])
+    Dist = hamming_distance(data['Xtest'], data['Xtrain'])
+    y_sorted = sort_train_labels_knn(Dist, data['ytrain'])
+    p_y_x = p_y_x_knn(y_sorted, best_k)
+    error_KNN = classification_error(p_y_x, data['ytest'])
 
-    #   p_y = estimate_a_priori_nb(data['ytrain'])
-    #   p_y_x = p_y_x_nb(p_y, p_x_y, data['Xtest'])
-    #   error_NB = classification_error(p_y_x, data['ytest'])
+    p_y = estimate_a_priori_nb(data['ytrain'])
+    p_y_x = p_y_x_nb(p_y, p_x_y, data['Xtest'])
+    error_NB = classification_error(p_y_x, data['ytest'])
 
-    #   plot_error_NB_KNN(error_NB, error_KNN)
-    #   print('\n--- Wcisnij klawisz, aby kontynuowac ---')
-
+    plot_error_NB_KNN(error_NB, error_KNN)
+    print('\n--- Wcisnij klawisz, aby kontynuowac ---')
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")

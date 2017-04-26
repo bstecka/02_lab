@@ -133,21 +133,18 @@ def estimate_p_x_y_nb(Xtrain, ytrain, a, b):
     :return: funkcja wyznacza rozklad prawdopodobienstwa p(x|y) zakladajac, ze x przyjmuje wartosci binarne i ze elementy
     x sa niezalezne od siebie. Funkcja zwraca macierz p_x_y o wymiarach MxD. #prawdopodobienstwo ze slowo nalezy do kategorii
     """
-    M = len(np.unique(ytrain))
-    N = len(ytrain)
     D = Xtrain.shape[1]
-    matrix = np.zeros(shape=(M, D))
-    divisor_matrix = np.zeros(shape=(M, D))
-    for d in range(D):
-        for m in range(M):
-            for n in range(N):
-                if ytrain[n] == m + 1:
-                    divisor_matrix[m, d] += 1
-                    if Xtrain[n, d] == 1:
-                        matrix[m, d] += 1
-            divisor_matrix[m, d] += (a + b - 2)
-            matrix[m, d] += (a - 1)
-    return np.divide(matrix, divisor_matrix)
+    Xtrain = Xtrain.toarray()
+    M = len(np.unique(ytrain))
+    rows = []
+    for m in range(1, M + 1):
+        row = np.empty([1, D])
+        yk = np.equal(ytrain, m)
+        yksum = np.sum(yk)
+        for d in range(0, D):
+            row[0, d] = np.sum(Xtrain[:, d] * yk)
+        rows.append(np.divide(np.add(row, a - 1), yksum + a + b - 2))
+    return np.vstack(rows)
 
 def p_y_x_nb(p_y, p_x_1_y, X):
     """
@@ -157,24 +154,20 @@ def p_y_x_nb(p_y, p_x_1_y, X):
     :return: funkcja wyznacza rozklad prawdopodobienstwa p(y|x) dla kazdej z klas z wykorzystaniem klasyfikatora Naiwnego
     Bayesa. Funkcja zwraca macierz p_y_x o wymiarach NxM.
     """
+    M = len(p_y)
     N = X.shape[0]
-    D = X.shape[1]
-    M = p_x_1_y.shape[0]
-    p_y_x = np.zeros(shape=(N, M))
+    result = np.zeros(shape=(N, M))
+    N_M_ones = np.ones_like(p_x_1_y)
+    p_x_0_y = np.subtract(np.ones(shape=(p_x_1_y.shape[0], p_x_1_y.shape[1])), p_x_1_y)
+    NOT_X = np.subtract(np.ones(shape=(X.shape[0], X.shape[1])), X.toarray())
     for n in range(0, N):
-        B_y = np.zeros(shape=(1, M))
-        B_y_sum = 0
-        for m in range(0, M):
-            B = 1
-            for d in range(0, D):
-                if X[n, d] == 1:
-                    B *= p_x_1_y[m, d]
-                else:
-                    B *= (1 - p_x_1_y[m, d])
-            B_y_sum += (B * p_y[m])
-            B_y[0, m] = B
-        p_y_x[n, :] = (B_y[0] * p_y) / B_y_sum
-    return p_y_x
+        temp = p_x_1_y.copy()
+        temp[:][:] += X[n][:]
+        temp -= 1
+        temp = np.absolute(temp)
+        result[n] = p_y * np.prod(temp, axis=1)
+        result[n] /= np.sum(result[n])
+    return result
 
 def model_selection_nb(Xtrain, Xval, ytrain, yval, a_values, b_values):
     """
