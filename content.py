@@ -173,8 +173,7 @@ def p_y_x_nb(p_y, p_x_1_y, X):
                     B *= (1 - p_x_1_y[m, d])
             B_y_sum += (B * p_y[m])
             B_y[0, m] = B
-        for m in range(0, M):
-            p_y_x[n, m] = (B_y[0, m] * p_y[m])/ B_y_sum
+        p_y_x[n, :] = (B_y[0] * p_y) / B_y_sum
     return p_y_x
 
 def model_selection_nb(Xtrain, Xval, ytrain, yval, a_values, b_values):
@@ -190,6 +189,7 @@ def model_selection_nb(Xtrain, Xval, ytrain, yval, a_values, b_values):
     osiagniety blad, best_a - a dla ktorego blad byl najnizszy, best_b - b dla ktorego blad byl najnizszy,
     errors - macierz wartosci bledow dla wszystkich par (a,b) ?
     """
+    print('---start--- ')
     error_best = 10
     A = len(a_values)
     B = len(b_values)
@@ -207,4 +207,5 @@ def model_selection_nb(Xtrain, Xval, ytrain, yval, a_values, b_values):
                 error_best = error
                 best_a_index = a
                 best_b_index = b
+    print('---koniec--- ')
     return error_best, a_values[best_a_index], b_values[best_b_index], errors
