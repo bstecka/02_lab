@@ -139,11 +139,11 @@ def estimate_p_x_y_nb(Xtrain, ytrain, a, b):
     rows = []
     for m in range(1, M + 1):
         row = np.empty([1, D])
-        yk = np.equal(ytrain, m)
-        yksum = np.sum(yk)
+        y_from_cat = np.equal(ytrain, m)
+        y_from_cat_count = np.sum(y_from_cat)
         for d in range(0, D):
-            row[0, d] = np.sum(Xtrain[:, d] * yk)
-        rows.append(np.divide(np.add(row, a - 1), yksum + a + b - 2))
+            row[0, d] = np.sum(Xtrain[:, d] * y_from_cat)
+        rows.append(np.divide(np.add(row, a - 1), y_from_cat_count + a + b - 2))
     return np.vstack(rows)
 
 def p_y_x_nb(p_y, p_x_1_y, X):
@@ -157,9 +157,6 @@ def p_y_x_nb(p_y, p_x_1_y, X):
     M = len(p_y)
     N = X.shape[0]
     result = np.zeros(shape=(N, M))
-    N_M_ones = np.ones_like(p_x_1_y)
-    p_x_0_y = np.subtract(np.ones(shape=(p_x_1_y.shape[0], p_x_1_y.shape[1])), p_x_1_y)
-    NOT_X = np.subtract(np.ones(shape=(X.shape[0], X.shape[1])), X.toarray())
     for n in range(0, N):
         temp = p_x_1_y.copy()
         temp[:][:] += X[n][:]
