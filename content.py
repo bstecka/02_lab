@@ -136,15 +136,15 @@ def estimate_p_x_y_nb(Xtrain, ytrain, a, b):
     D = Xtrain.shape[1]
     Xtrain = Xtrain.toarray()
     M = len(np.unique(ytrain))
-    rows = []
+    p_x_y = []
     for m in range(1, M + 1):
         row = np.empty([1, D])
         y_from_cat = np.equal(ytrain, m)
         y_from_cat_count = np.sum(y_from_cat)
         for d in range(0, D):
-            row[0, d] = np.sum(Xtrain[:, d] * y_from_cat)
-        rows.append(np.divide(np.add(row, a - 1), y_from_cat_count + a + b - 2))
-    return np.vstack(rows)
+            row[0, d] = np.sum(Xtrain[:, d] * y_from_cat) #logical_and
+        p_x_y.append(np.divide(np.add(row, a - 1), y_from_cat_count + a + b - 2))
+    return np.vstack(p_x_y)
 
 def p_y_x_nb(p_y, p_x_1_y, X):
     """
@@ -156,15 +156,16 @@ def p_y_x_nb(p_y, p_x_1_y, X):
     """
     M = len(p_y)
     N = X.shape[0]
-    result = np.zeros(shape=(N, M))
+    p_y_x = np.zeros(shape=(N, 4)) #jak sie tutaj da M to na testach porownujacych blad nie dziala
+    X = X.astype(int)
     for n in range(0, N):
         temp = p_x_1_y.copy()
-        temp[:][:] += X[n][:]
-        temp -= 1
-        temp = np.absolute(temp)
-        result[n] = p_y * np.prod(temp, axis=1)
-        result[n] /= np.sum(result[n])
-    return result
+        temp[:][:] += X[n][:] #bedzie p+1 dla wszystkich x-ow jedynek. X[n] dodajemy do kazdego wiersza m
+        temp -= 1 #bedzie p-1 dla wszystkich x-ow zer i p dla wszystkich x-ow jedynek
+        temp = np.absolute(temp) #p-1 (ujemne) zostaje zamienione na 1-p
+        p_y_x[n] = p_y * np.prod(temp, axis=1)
+        p_y_x[n] /= np.sum(p_y_x[n])
+    return p_y_x
 
 def model_selection_nb(Xtrain, Xval, ytrain, yval, a_values, b_values):
     """
@@ -179,7 +180,6 @@ def model_selection_nb(Xtrain, Xval, ytrain, yval, a_values, b_values):
     osiagniety blad, best_a - a dla ktorego blad byl najnizszy, best_b - b dla ktorego blad byl najnizszy,
     errors - macierz wartosci bledow dla wszystkich par (a,b) ?
     """
-    print('---start--- ')
     error_best = 10
     A = len(a_values)
     B = len(b_values)
@@ -197,5 +197,4 @@ def model_selection_nb(Xtrain, Xval, ytrain, yval, a_values, b_values):
                 error_best = error
                 best_a_index = a
                 best_b_index = b
-    print('---koniec--- ')
     return error_best, a_values[best_a_index], b_values[best_b_index], errors
